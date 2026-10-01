@@ -1,0 +1,39 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Audit database & logs
+*.db
+*.db-journal
+*.sqlite
+*.jsonl
+
+# Rust build output
+/target
+**/target
+
+# Node / Vite
+node_modules/
+# Build outputs: the *contents* are ignored, not the directory itself, so the one
+# file that has to be tracked below can be re-included (git cannot re-include a
+# file inside an excluded directory). See decisions §69.
+dist/*
+/ui/node_modules
+/ui/dist/*
+!/ui/dist/.gitkeep
+
+# Tauri generated
+/ui/src-tauri/gen/schemas
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+.cowork-temp/
+*.log

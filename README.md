@@ -2,10 +2,21 @@
 
 # riscdom-server — the control plane
 
-> **Applies to v0.9. The surface is unstable until v1.0.** This is the integrator's
-> document: how to build it, how to start it, and what answers today. The protocol it
-> implements is settled in [docs/control-plane-api.md](../docs/control-plane-api.md) and
-> [docs/control-plane-events.md](../docs/control-plane-events.md).
+> **This is its own repository** (v1.0 M8-4a): the control plane as a program, split out of
+> the kernel. It takes the kernel as a git dependency pinned to `v1.0.0`, and the protocol
+> it implements is settled by the kernel's documents —
+> [`docs/control-plane-api.md`](https://github.com/breakevery/riscdom/blob/v1.0.0/docs/control-plane-api.md)
+> and
+> [`docs/control-plane-events.md`](https://github.com/breakevery/riscdom/blob/v1.0.0/docs/control-plane-events.md).
+
+**Starting it is the local mode.** This program *is* what the `riscdom` CLI used to start
+inside itself: run `riscdom-server --bind 127.0.0.1:7821 --workspace . --data-dir ~/.riscdom`
+and point the CLI at it with `--remote 127.0.0.1:7821`. There is no separate `serve`
+subcommand — the server is the server.
+
+**The web UI is not bundled yet.** The page this server serves is `riscdom-adminapp`'s
+built front end, and it arrives from that repository's release when the split reaches
+M8-4b. Until then a run without `--web-root` serves the API and no page.
 
 `riscdom-server` is the RiscDom control plane as a process: the same HTTP + SSE interface a
 human supervisor and an AI supervisor both use. It is **Layer 3** over the kernel facade's

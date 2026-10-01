@@ -1,0 +1,117 @@
+name: CI
+
+# This repository is `riscdom-server`, the control plane as a program (v1.0 M8-4a).
+# It is one consumer of the kernel, which it takes as a git dependency pinned to a
+# tag — so this gate checks **this** repository's crate, and the kernel is checked by
+# the kernel's own gate (docs/server-distribution.md; the kernel's
+# docs/multi-repo.md §3).
+#
+# The same shape the kernel repository keeps: one command list, invoked identically
+# by CI and by a developer.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # `host-core` reaches `keyring`, whose Linux backend builds `libdbus-sys` and
+      # probes for the system `dbus-1` with `pkg-config`.
+      - name: install linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdbus-1-dev pkg-config libssl-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets --no-deps -- -D warnings
+
+      - name: cargo test
+        run: cargo test --no-fail-fast
+
+  # Tag-gated, like the kernel repository's packaging job: a release's archives are
+  # built by the tag that asks for them, or by a manual dispatch.
+  server-bundle:
+    name: server-bundle (${{ matrix.os }})
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y libdbus-1-dev pkg-config libssl-dev build-essential
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: build
+        run: cargo build --release --bin riscdom-server
+
+      # The archive holds the program, a README and an example settings file. The web
+      # UI is **not** bundled yet: it is `riscdom-adminapp`'s built front end, and it
+      # arrives from that repository's release once the split reaches M8-4b. A server
+      # with no `--web-root` serves the API and no page, which is what the README says.
+      - name: pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(grep -m1 '^version = ' Cargo.toml | cut -d'"' -f2)
+          case "${{ runner.os }}" in
+            Linux) platform=linux-x86_64 ;;
+            macOS) platform=macos-arm64 ;;
+            *) platform=unknown ;;
+          esac
+          name="riscdom-server-$version-$platform"
+          mkdir -p "dist/$name"
+          cp target/release/riscdom-server "dist/$name/"
+          cp README.md "dist/$name/README.md"
+          printf '{\n  "version": 2\n}\n' > "dist/$name/settings.example.json"
+          tar -czf "dist/$name.tar.gz" -C dist "$name"
+
+      - name: upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: riscdom-server-${{ runner.os }}
+          path: dist/*.tar.gz

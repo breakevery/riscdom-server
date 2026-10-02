@@ -2492,8 +2492,8 @@ mod tests {
 
     /// The API document and its translation: the numbers in §5's headings are the counts
     /// the route table must have (v0.9 clean-up batch — no literal here to bump).
-    const API_DOC: &str = include_str!("../../docs/control-plane-api.md");
-    const API_DOC_ZH: &str = include_str!("../../docs/control-plane-api.zh-CN.md");
+    const API_DOC: &str = include_str!("../docs/control-plane-api.md");
+    const API_DOC_ZH: &str = include_str!("../docs/control-plane-api.zh-CN.md");
 
     /// The count a §5 heading claims: `### 5.1 Queries (32)`, or the translation's
     /// `### 5.1 查询类（32）`.
@@ -2623,8 +2623,8 @@ mod tests {
     /// copies its `tools[]` from; a route that lands without a row there is a tool nobody
     /// can call. The translation is checked too, because a drifted translation is a
     /// drifted document.
-    const TOOL_SCHEMA_DOC: &str = include_str!("../../docs/tool-schema-control-plane.md");
-    const TOOL_SCHEMA_DOC_ZH: &str = include_str!("../../docs/tool-schema-control-plane.zh-CN.md");
+    const TOOL_SCHEMA_DOC: &str = include_str!("../docs/tool-schema-control-plane.md");
+    const TOOL_SCHEMA_DOC_ZH: &str = include_str!("../docs/tool-schema-control-plane.zh-CN.md");
 
     /// The rows of the document's marked tables: `(block, tool, method, path, capability)`.
     fn tool_rows(doc: &str) -> Vec<(String, String, String, String, String)> {

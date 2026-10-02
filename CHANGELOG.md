@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-02
+
 ### Added
 
 - **A Debian package for Linux** (v1.x batch ED-5): the `server-bundle` job's ubuntu leg now also
@@ -34,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   M8-4b. Both now describe `web/`, and say where the full management UI lives
   (`riscdom-adminapp`).
 - **The README's stale version example is fixed** (v1.x batch ED-5): `/v0/health`'s answer was shown
-  as `"version":"0.8.0"`; it is `1.0.0`.
+  as `"version":"0.8.0"`; it is the program's own version (`1.0.0` when this was fixed).
 - **`docs/server-distribution.md` covers the `.deb`** (v1.x batch ED-5): §1 says where its files
   land, and §4's platform table gained the Linux `.deb` row.
 

@@ -1,6 +1,6 @@
 [package]
 name = "server"
-version = "1.0.0"
+version = "1.0.2"
 edition = "2021"
 description = "RiscDom control plane: HTTP + SSE over the host's kernel facade (Layer 3)"
 

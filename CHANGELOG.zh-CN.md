@@ -9,6 +9,8 @@
 
 ## [未发布]
 
+## [1.0.2] - 2026-10-02
+
 ### 新增
 
 - **一个面向 Linux 的 Debian 包**（v1.x 批 ED-5）：`server-bundle` 作业的 ubuntu leg 现在还会用 `dpkg-deb` 构建 `riscdom-server_<version>_amd64.deb` —— 二进制在 `/usr/bin/riscdom-server`，而 `web/` 与 `settings.example.json` 在 `/usr/share/riscdom-server/` 下。macOS leg 未变。
@@ -18,7 +20,7 @@
 ### 变更
 
 - **README 不再自称 web UI 尚未发布**（v1.x 批 ED-4）：「not bundled yet —— 拆仓到 M8-4b 时它才来」这句已过期（拆仓已收尾），而 `--web-root` 那段描述的是 `ui/` —— 本仓自 v1.0 M8-4b 起就没有这个目录了。两者现在都改讲 `web/`，并说明完整管理 UI 在哪里（`riscdom-adminapp`）。
-- **README 里过期的版本示例已修**（v1.x 批 ED-5）：`/v0/health` 的应答曾写成 `"version":"0.8.0"`；它是 `1.0.0`。
+- **README 里过期的版本示例已修**（v1.x 批 ED-5）：`/v0/health` 的应答曾写成 `"version":"0.8.0"`；它是程序自己的版本（修这一处时是 `1.0.0`）。
 - **`docs/server-distribution.md` 覆盖 `.deb`**（v1.x 批 ED-5）：§1 说明其文件落在何处，§4 的平台表多了 Linux `.deb` 一行。
 
 ### 移除

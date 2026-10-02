@@ -1479,7 +1479,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "1.0.0"
+version = "1.0.2"
 dependencies = [
  "futures-util",
  "getrandom 0.4.3",

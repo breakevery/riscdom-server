@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RiscDom — node status</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 0 auto; padding: 2rem 1.25rem; max-width: 46rem;
+      }
+      h1 { font-size: 1.3rem; margin: 0 0 .35rem; }
+      p.lead { margin: 0 0 1.6rem; opacity: .75; }
+      code { font-size: .92em; }
+      label { display: block; font-weight: 600; margin-bottom: .3rem; }
+      .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+      input { flex: 1 1 16rem; padding: .45rem .6rem; font: inherit; }
+      button { padding: .45rem .9rem; font: inherit; cursor: pointer; }
+      table { border-collapse: collapse; width: 100%; margin-top: 1.5rem; }
+      th, td { text-align: left; padding: .45rem .55rem; border-bottom: 1px solid rgba(128,128,128,.35); vertical-align: top; }
+      th { width: 11rem; font-weight: 600; }
+      td { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; word-break: break-all; }
+      .note { margin-top: .9rem; opacity: .75; font-size: .9em; }
+      .err { color: #c0392b; opacity: 1; }
+      @media (prefers-color-scheme: dark) { .err { color: #ff8a80; } }
+    </style>
+  </head>
+  <body>
+    <h1>RiscDom — node status</h1>
+    <p class="lead">Reads <code>/v0/status</code> from this control plane every five seconds.</p>
+
+    <label for="token">Bearer token</label>
+    <div class="row">
+      <input id="token" type="password" autocomplete="off" spellcheck="false"
+             placeholder="paste the token from <data-dir>/token" />
+      <button id="use" type="button">Use</button>
+      <button id="clear" type="button">Clear</button>
+    </div>
+    <p class="note">
+      The API needs the node's bearer token, the file the server names at start-up
+      (<code>&lt;data-dir&gt;/token</code>). It is kept in <code>sessionStorage</code> for this tab
+      only — never a cookie, and never sent anywhere but this server.
+    </p>
+
+    <table>
+      <tbody id="rows"><tr><td colspan="2">…</td></tr></tbody>
+    </table>
+    <p id="message" class="note">Paste the bearer token and press Use.</p>
+
+    <script>
+      (function () {
+        "use strict";
+        var FIELDS = ["status", "version", "uptime_ms", "connections", "sse_subscribers", "agents", "agent_id"];
+        var KEY = "riscdom-status-token";
+        var tokenInput = document.getElementById("token");
+        var rows = document.getElementById("rows");
+        var message = document.getElementById("message");
+
+        function tell(text, isError) {
+          message.textContent = text;
+          message.className = isError ? "err" : "note";
+        }
+
+        function render(data) {
+          rows.textContent = "";
+          FIELDS.forEach(function (name) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.textContent = name;
+            var td = document.createElement("td");
+            td.textContent = data[name] === undefined || data[name] === null ? "—" : String(data[name]);
+            tr.appendChild(th);
+            tr.appendChild(td);
+            rows.appendChild(tr);
+          });
+        }
+
+        function token() {
+          try { return sessionStorage.getItem(KEY) || ""; } catch (e) { return ""; }
+        }
+
+        function poll() {
+          var value = token();
+          if (!value) { tell("Paste the bearer token and press Use.", false); return; }
+          fetch("/v0/status", { headers: { Authorization: "Bearer " + value }, cache: "no-store" })
+            .then(function (response) {
+              if (response.status === 401) { tell("401 unauthorized — the token was refused.", true); return null; }
+              if (!response.ok) { tell("HTTP " + response.status + " " + response.statusText, true); return null; }
+              return response.json();
+            })
+            .then(function (data) {
+              if (!data) { return; }
+              render(data);
+              tell("Updated " + new Date().toLocaleTimeString() + ".", false);
+            })
+            .catch(function (error) {
+              tell("Cannot reach the control plane: " + error, true);
+            });
+        }
+
+        document.getElementById("use").addEventListener("click", function () {
+          var value = tokenInput.value.trim();
+          try {
+            if (value) { sessionStorage.setItem(KEY, value); } else { sessionStorage.removeItem(KEY); }
+          } catch (e) { /* a browser with storage disabled: the page still explains itself */ }
+          tokenInput.value = "";
+          poll();
+        });
+
+        document.getElementById("clear").addEventListener("click", function () {
+          try { sessionStorage.removeItem(KEY); } catch (e) { /* as above */ }
+          tokenInput.value = "";
+          rows.textContent = "";
+          tell("Paste the bearer token and press Use.", false);
+        });
+
+        if (token()) { poll(); } else { tell("Paste the bearer token and press Use.", false); }
+        setInterval(poll, 5000);
+      })();
+    </script>
+  </body>
+</html>

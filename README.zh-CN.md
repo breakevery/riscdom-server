@@ -8,6 +8,8 @@
 
 API 表格里的 62 个端点全部可经 HTTP 调用，另有三个宿主本地端点、两条以 `501` 明示的预留路由，以及事件流。token 默认开启，且每条路由的 capability 都会被强制。
 
+**随包附一个最小 web 状态页。** `web/` 里是一个小的、自包含的状态页：粘贴本节点的 bearer token，它每五秒读一次 `/v0/status`，显示版本、运行时长、连接数、SSE 订阅者数与 agent id。用 `riscdom-server --web-root web` 提供它。**完整管理 UI** 是 `riscdom-adminapp` 的构建产物——想要那个就把 `--web-root` 指向它的目录。
+
 ## 编译
 
 ```bash
@@ -28,7 +30,7 @@ riscdom-server --bind 127.0.0.1:7821 --workspace ./my-workspace
 | `--bind <addr>` | `127.0.0.1:7821`，或 `$RISCDOM_BIND` | 监听地址。 |
 | `--workspace <dir>` | 当前目录 | 本宿主拥有的 workspace。其审计链位于 `<workspace>/.riscdom/audit.db`。 |
 | `--data-dir <dir>` | 本平台的宿主数据目录 | settings 与 sessions 所在处（v0.8 的注入式 data dir）。 |
-| `--web-root <dir>` | 无 | 从这里提供**构建好的 Web UI**（v0.9 D2a）：`/` 回 `index.html`，`/assets/*` 回它的文件，与 API 同源。请求时读盘，因此不内嵌任何东西。不给此参数时，只提供 API，与之前完全一致。 |
+| `--web-root <dir>` | 无 | 从这里提供 Web UI（v0.9 D2a）：`/` 回 `index.html`，`/assets/*` 回它的文件，与 API 同源。请求时读盘，因此不内嵌任何东西。**`web/` 里自带一个最小状态页**，所以 `--web-root web` 开箱可用；完整管理 UI 是 `riscdom-adminapp` 的构建产物。不给此参数时，只提供 API，与之前完全一致。 |
 | `--heartbeat-ms <n>` | `15000` | SSE 心跳周期；`0` 关闭。 |
 | `--auth` | 开 | 要求 `<data-dir>/token` 里的 bearer token（默认）。 |
 | `--no-auth` | | 取消该要求并打印警告：仅用于本地调试。 |
@@ -40,7 +42,7 @@ riscdom-server --bind 127.0.0.1:7821 --workspace ./my-workspace
 
 默认只绑回环是刻意的：本构建提供**明文 HTTP**，未明确指定时不会监听公网接口。
 
-带 `--web-root` 时，服务端还会从该目录应答 `/` 与 `/assets/*`（即 `ui/` 里 `npm run build` 的产物）——这正是让管理界面能在局域网内用手机浏览器打开的东西。三件事是刻意的：页面**不需要 token**（文档、样式表与脚本不带任何秘密；`/v0/` 下的一切仍然要），**没有 SPA fallback**（未知路径就是 API 的 404），且资源是每次请求读盘，所以前端重建不需要重编 Rust。路径穿越会被拒：名字里带 `..` 的永远不会是一个文件，而真正找到的文件必须解析在 web root 之内。
+带 `--web-root` 时，服务端还会从该目录应答 `/` 与 `/assets/*`。随包附带的 `web/` 是一个**最小状态页**——单个自包含 `index.html`——而该目录也可以放任意构建（完整管理 UI 是 `riscdom-adminapp` 的构建产物）。四件事是刻意的：页面**不需要 token**（文档、样式表与脚本不带任何秘密；`/v0/` 下的一切仍然要——页面会向操作者索要它并存在该标签页的 `sessionStorage` 里），**没有 SPA fallback**（未知路径就是 API 的 404，所以页面是单个文件、不使用 `/assets/`），资源是每次请求读盘，所以前端重建不需要重编 Rust，且路径穿越会被拒：名字里带 `..` 的永远不会是一个文件，而真正找到的文件必须解析在 web root 之内。
 
 ## 端点
 

@@ -21,7 +21,7 @@ one is built, and what it does not carry.
 | Entry | What it is |
 |---|---|
 | `riscdom-server` (`.exe` on Windows) | The control plane: HTTP + SSE over the kernel's host facade ([README.md](../README.md)). |
-| `web/` | The built Web UI, served at `/` by `--web-root web` (unauthenticated; the API is not). The build is [`riscdom-adminapp`](https://github.com/breakevery/riscdom-adminapp)'s. |
+| `web/` | A **minimal status page** (`index.html`), served at `/` by `--web-root web` (unauthenticated; the API is not). The full management UI is [`riscdom-adminapp`](https://github.com/breakevery/riscdom-adminapp)'s build; point `--web-root` at it instead if you want that. |
 | `README.md` | [README.md](../README.md) — how to build, run, the endpoints, authentication. |
 | `settings.example.json` | A minimal, valid settings document (`{"version": 2}`), for a first run. |
 
@@ -39,15 +39,16 @@ full flag set is the program's own `--help` (`--bind`, `--workspace`, `--data-di
   and a RISC-V GCC to boot guests — but that is the operator's installed toolchain, the same one the
   desktop app uses, not something a package bundles: see
   [qemu-setup.md](https://github.com/breakevery/riscdom/blob/v1.0.0/docs/qemu-setup.md).)
-- **No source for the front end.** `web/` is a **build**, taken from `riscdom-adminapp`'s release —
-  this repository keeps no second copy of the UI's source.
+- **No second copy of the management UI.** `web/` is this repository's own minimal status page
+  (hand-written, one self-contained `index.html`, no build step). The full management UI's source
+  is **not** here — it is `riscdom-adminapp`'s, and a package does not carry it.
 
 ## 3. Building a package
 
 **This repository has no separate packer.** Its tag-gated `server-bundle` job —
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — builds the release binary, copies
-`README.md` (and the built `web/` when a front end is supplied), writes a
-`settings.example.json`, and leaves the `.tar.gz` as a run artifact. The kernel's packer
+`README.md` and `web/`, writes a `settings.example.json`, and leaves the `.tar.gz` as a run
+artifact. The kernel's packer
 (`riscdom/scripts/pack.{sh,ps1}`) builds the **relay**, which is that repository's program.
 
 The **version** comes from this repository's `Cargo.toml` (its own workspace), so a package cannot

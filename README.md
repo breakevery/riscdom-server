@@ -14,9 +14,11 @@ inside itself: run `riscdom-server --bind 127.0.0.1:7821 --workspace . --data-di
 and point the CLI at it with `--remote 127.0.0.1:7821`. There is no separate `serve`
 subcommand — the server is the server.
 
-**The web UI is not bundled yet.** The page this server serves is `riscdom-adminapp`'s
-built front end, and it arrives from that repository's release when the split reaches
-M8-4b. Until then a run without `--web-root` serves the API and no page.
+**A minimal web status page ships with it.** `web/` holds a small, self-contained status
+page: paste the node's bearer token and it reads `/v0/status` every five seconds, showing
+the version, uptime, connections, SSE subscribers and the agent id. Serve it with
+`riscdom-server --web-root web`. The **full management UI** is `riscdom-adminapp`'s build —
+point `--web-root` at that directory instead if you want it.
 
 `riscdom-server` is the RiscDom control plane as a process: the same HTTP + SSE interface a
 human supervisor and an AI supervisor both use. It is **Layer 3** over the kernel facade's
@@ -49,7 +51,7 @@ riscdom-server --bind 127.0.0.1:7821 --workspace ./my-workspace
 | `--bind <addr>` | `127.0.0.1:7821`, or `$RISCDOM_BIND` | Address to listen on. |
 | `--workspace <dir>` | the current directory | The workspace this host owns. Its audit chain lives at `<workspace>/.riscdom/audit.db`. |
 | `--data-dir <dir>` | this platform's host data dir | Where settings and sessions live (the v0.8 injected-data-dir path). |
-| `--web-root <dir>` | none | Serve the **built Web UI** from here (v0.9 D2a): `index.html` at `/` and its files under `/assets/*`, same origin as the API. Read at request time, so nothing is embedded. Without it the API is served exactly as before. |
+| `--web-root <dir>` | none | Serve a Web UI from here (v0.9 D2a): `index.html` at `/` and its files under `/assets/*`, same origin as the API. Read at request time, so nothing is embedded. **A minimal status page is included at `web/`**, so `--web-root web` works out of the box; the full management UI is `riscdom-adminapp`'s build. Without the flag the API is served exactly as before. |
 | `--heartbeat-ms <n>` | `15000` | SSE heartbeat period; `0` disables it. |
 | `--auth` | on | Require the bearer token in `<data-dir>/token` (the default). |
 | `--no-auth` | | Drop the requirement and print a warning: for local debugging. |
@@ -64,13 +66,15 @@ they are this binary's own console output, and an embedded server never runs thi
 The loopback default is deliberate: this build serves **plaintext HTTP**, so it does not
 listen on a public interface unless you tell it to.
 
-With `--web-root` the server also answers `/` and `/assets/*` from that directory (the output of
-`npm run build` in `ui/`), which is what makes the management interface reachable from a phone
-browser on the LAN. Three things about it are deliberate: the page is served **without a token**
-(a document, a stylesheet and a script carry no secret; everything under `/v0/` still needs one),
-there is **no SPA fallback** (an unknown path is the API's 404), and the assets are read from disk
-per request, so a rebuilt frontend needs no Rust rebuild. Traversal is refused: a name with `..`
-in it is never a file, and the file that is found must resolve inside the web root.
+With `--web-root` the server also answers `/` and `/assets/*` from that directory. The shipped
+`web/` is a **minimal status page** — one self-contained `index.html` — and the directory may
+hold any build instead (the full management UI is `riscdom-adminapp`'s). Four things about it
+are deliberate: the page is served **without a token** (a document, a stylesheet and a script
+carry no secret; everything under `/v0/` still needs one — the page asks for it and keeps it in
+`sessionStorage` for the tab), there is **no SPA fallback** (an unknown path is the API's 404,
+which is why the page is a single file and uses no `/assets/`), the assets are read from disk
+per request, so a rebuilt frontend needs no Rust rebuild, and traversal is refused: a name with
+`..` in it is never a file, and the file that is found must resolve inside the web root.
 
 ## Endpoints
 

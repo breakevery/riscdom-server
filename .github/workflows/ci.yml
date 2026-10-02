@@ -89,10 +89,11 @@ jobs:
       - name: build
         run: cargo build --release --bin riscdom-server
 
-      # The archive holds the program, a README and an example settings file. The web
-      # UI is **not** bundled yet: it is `riscdom-adminapp`'s built front end, and it
-      # arrives from that repository's release once the split reaches M8-4b. A server
-      # with no `--web-root` serves the API and no page, which is what the README says.
+      # The archive holds the program, a README, an example settings file and the
+      # minimal web status page. `web/` is this repository's own — a single
+      # self-contained `index.html`, served by `--web-root web` — not a copy of
+      # `riscdom-adminapp`'s front end (that build is there for anyone who wants the
+      # full management UI, but it is not what ships here).
       - name: pack
         shell: bash
         run: |
@@ -107,6 +108,7 @@ jobs:
           mkdir -p "dist/$name"
           cp target/release/riscdom-server "dist/$name/"
           cp README.md "dist/$name/README.md"
+          cp -r web "dist/$name/web"
           printf '{\n  "version": 2\n}\n' > "dist/$name/settings.example.json"
           tar -czf "dist/$name.tar.gz" -C dist "$name"
 

@@ -20,7 +20,7 @@
 | 条目 | 是什么 |
 |---|---|
 | `riscdom-server`（Windows 上为 `.exe`） | 控制平面：内核 host 门面之上的 HTTP + SSE（[README.md](../README.md)）。 |
-| `web/` | 构建好的 Web UI，由 `--web-root web` 挂在 `/`（页面无需鉴权；API 需要）。该构建是 [`riscdom-adminapp`](https://github.com/breakevery/riscdom-adminapp) 的。 |
+| `web/` | 一个**最小状态页**（`index.html`），由 `--web-root web` 挂在 `/`（页面无需鉴权；API 需要）。完整管理 UI 是 [`riscdom-adminapp`](https://github.com/breakevery/riscdom-adminapp) 的构建产物；想要那个就把 `--web-root` 指向它。 |
 | `README.md` | [README.md](../README.md) —— 怎么构建、怎么运行、端点、鉴权。 |
 | `settings.example.json` | 一份最小、合法的 settings 文档（`{"version": 2}`），供首次运行。 |
 
@@ -37,14 +37,13 @@ flag 集以程序自己的 `--help` 为准（`--bind`、`--workspace`、`--data-
 - **不带 QEMU，也不带 RISC-V GCC。** 控制平面是一个普通 Rust 二进制。（它仍**需要** QEMU 与 RISC-V
   GCC 来启动访客 —— 但那是运维自己装好的工具链、与桌面应用同一套，不是包要捆绑的东西：见
   [qemu-setup.md](https://github.com/breakevery/riscdom/blob/v1.0.0/docs/qemu-setup.md)。）
-- **不带前端的源码。** `web/` 是一份**构建产物**，取自 `riscdom-adminapp` 的 release —— 本仓不留
-  UI 源码的第二份拷贝。
+- **不带管理 UI 的第二份拷贝。** `web/` 是本仓自己的最小状态页（手写、一个自包含 `index.html`、无构建步骤）。完整管理 UI 的源码**不**在这里 —— 它是 `riscdom-adminapp` 的，包也不携带它。
 
 ## 3. 构建一个包
 
 **本仓没有独立的打包器。** 它的 tag 触发作业 `server-bundle` ——
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) —— 构建 release 二进制、复制 `README.md`
-（并在提供前端时一并放入构建好的 `web/`）、写一份 `settings.example.json`，把 `.tar.gz` 作为运行制品
+与 `web/`、写一份 `settings.example.json`，把 `.tar.gz` 作为运行制品
 留下。内核的打包器（`riscdom/scripts/pack.{sh,ps1}`）打的是 **relay**，那是那个仓的程序。
 
 **版本**来自本仓 `Cargo.toml`（它自己的 workspace），所以包不可能与里面的二进制不一致。**平台**是

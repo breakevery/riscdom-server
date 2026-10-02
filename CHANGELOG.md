@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A Debian package for Linux** (v1.x batch ED-5): the `server-bundle` job's ubuntu leg now also
+  builds `riscdom-server_<version>_amd64.deb` with `dpkg-deb` — the binary at
+  `/usr/bin/riscdom-server`, and `web/` + `settings.example.json` under `/usr/share/riscdom-server/`.
+  The macOS leg is unchanged.
+- **The release process, written down** (v1.x batch ED-5): `docs/release-process.md` (+ zh) — what CI
+  produces and for how long it keeps it, what each archive holds, the **hand-built Windows `.zip`**
+  step (M7b-4: no repository has a Windows runner), the naming convention, and the `gh release
+  create` that finishes the job.
 - **A minimal web status page** (v1.x batch ED-4): `web/index.html` is a small, self-contained
   page that reads `/v0/status` — the node's version, uptime, connections, SSE subscribers and
   agent id — every five seconds. It takes the bearer token in a field and keeps it in
@@ -25,6 +33,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the `--web-root` text described `ui/`, a directory this repository has not had since v1.0
   M8-4b. Both now describe `web/`, and say where the full management UI lives
   (`riscdom-adminapp`).
+- **The README's stale version example is fixed** (v1.x batch ED-5): `/v0/health`'s answer was shown
+  as `"version":"0.8.0"`; it is `1.0.0`.
+- **`docs/server-distribution.md` covers the `.deb`** (v1.x batch ED-5): §1 says where its files
+  land, and §4's platform table gained the Linux `.deb` row.
+
+### Removed
+
+- **`.gitignore`'s leftover `ui/` rules** (v1.x batch ED-5): four lines (`/ui/node_modules`,
+  `/ui/dist/*`, `!/ui/dist/.gitkeep`, `/ui/src-tauri/gen/schemas`) named a directory this repository
+  has not had since v1.0 M8-4b.
+
+### Fixed
+
+- **`src/lib.rs`'s module comment** (v1.x batch ED-5): it said the crate "sits beside
+  `ui/src-tauri`"; that program left for `riscdom-adminapp` in v1.0 M8-4b.
 
 ## [1.0.1] - 2026-10-02
 

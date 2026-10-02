@@ -24,6 +24,10 @@
 | `README.md` | [README.md](../README.md) —— 怎么构建、怎么运行、端点、鉴权。 |
 | `settings.example.json` | 一份最小、合法的 settings 文档（`{"version": 2}`），供首次运行。 |
 
+**在 Linux 上，同样的文件也以 `.deb` 形态发布**（`riscdom-server_<version>_amd64.deb`）：二进制在
+`/usr/bin/riscdom-server`，而 `web/` 与 `settings.example.json` 在
+`/usr/share/riscdom-server/` 下。
+
 **运行它**：`riscdom-server --bind <addr> --workspace <dir> --data-dir <dir> --web-root web`。完整
 flag 集以程序自己的 `--help` 为准（`--bind`、`--workspace`、`--data-dir`、`--web-root`、
 `--heartbeat-ms`、`--auth` / `--no-auth`、`--log-level`；退出码 `0`/`1`/`2`）。
@@ -56,6 +60,7 @@ runner 的（`linux-x86_64`、`macos-arm64`、……）。制品落在该作业�
 | 平台 | 格式 | 备注 |
 |---|---|---|
 | Linux | `.tar.gz` | 由 `server-bundle` 作业在 `v*` tag 时构建。 |
+| Linux | `.deb` | 同一作业的 ubuntu leg：`riscdom-server_<version>_amd64.deb`。 |
 | macOS | `.tar.gz` | 同上。 |
 | Windows | `.zip` | **人工构建** —— 还没有 Windows runner（M7b-4）。 |
 

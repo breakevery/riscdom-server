@@ -25,6 +25,10 @@ one is built, and what it does not carry.
 | `README.md` | [README.md](../README.md) — how to build, run, the endpoints, authentication. |
 | `settings.example.json` | A minimal, valid settings document (`{"version": 2}`), for a first run. |
 
+**On Linux the same files also ship as a `.deb`** (`riscdom-server_<version>_amd64.deb`): the
+binary at `/usr/bin/riscdom-server`, and `web/` and `settings.example.json` under
+`/usr/share/riscdom-server/`.
+
 **Run it** with `riscdom-server --bind <addr> --workspace <dir> --data-dir <dir> --web-root web`. The
 full flag set is the program's own `--help` (`--bind`, `--workspace`, `--data-dir`, `--web-root`,
 `--heartbeat-ms`, `--auth` / `--no-auth`, `--log-level`; exit codes `0`/`1`/`2`).
@@ -63,6 +67,7 @@ archive as a run artifact.
 | Platform | Format | Notes |
 |---|---|---|
 | Linux | `.tar.gz` | Built by the `server-bundle` job on a `v*` tag. |
+| Linux | `.deb` | The same job's ubuntu leg: `riscdom-server_<version>_amd64.deb`. |
 | macOS | `.tar.gz` | Same. |
 | Windows | `.zip` | **Built by hand** — there is no Windows runner yet (M7b-4). |
 

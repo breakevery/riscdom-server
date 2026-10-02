@@ -11,11 +11,23 @@
 
 ### 新增
 
+- **一个面向 Linux 的 Debian 包**（v1.x 批 ED-5）：`server-bundle` 作业的 ubuntu leg 现在还会用 `dpkg-deb` 构建 `riscdom-server_<version>_amd64.deb` —— 二进制在 `/usr/bin/riscdom-server`，而 `web/` 与 `settings.example.json` 在 `/usr/share/riscdom-server/` 下。macOS leg 未变。
+- **把发布流程写下来**（v1.x 批 ED-5）：`docs/release-process.md`（+ zh）—— CI 产出什么、保留多久，每种归档含什么，**人工构建的 Windows `.zip`** 步骤（M7b-4：没有任何仓有 Windows runner），命名规范，以及收尾用的 `gh release create`。
 - **一个最小 web 状态页**（v1.x 批 ED-4）：`web/index.html` 是一个小的、自包含页面，每五秒读一次 `/v0/status` —— 节点的版本、运行时长、连接数、SSE 订阅者数与 agent id。它在一个输入框里接收 bearer token，并把它存在该标签页的 `sessionStorage` 里；页面自身的资产从不携带秘密，而 API 仍然对每一次调用鉴权。tag 触发的 `server-bundle` 作业现在会把 `web/` 复制进归档，所以 `riscdom-server --web-root web` 无需额外构建即可提供它。
 
 ### 变更
 
 - **README 不再自称 web UI 尚未发布**（v1.x 批 ED-4）：「not bundled yet —— 拆仓到 M8-4b 时它才来」这句已过期（拆仓已收尾），而 `--web-root` 那段描述的是 `ui/` —— 本仓自 v1.0 M8-4b 起就没有这个目录了。两者现在都改讲 `web/`，并说明完整管理 UI 在哪里（`riscdom-adminapp`）。
+- **README 里过期的版本示例已修**（v1.x 批 ED-5）：`/v0/health` 的应答曾写成 `"version":"0.8.0"`；它是 `1.0.0`。
+- **`docs/server-distribution.md` 覆盖 `.deb`**（v1.x 批 ED-5）：§1 说明其文件落在何处，§4 的平台表多了 Linux `.deb` 一行。
+
+### 移除
+
+- **`.gitignore` 的 `ui/` 残留规则**（v1.x 批 ED-5）：四行（`/ui/node_modules`、`/ui/dist/*`、`!/ui/dist/.gitkeep`、`/ui/src-tauri/gen/schemas`）指向一个本仓自 v1.0 M8-4b 起就没有的目录。
+
+### 修复
+
+- **`src/lib.rs` 的模块注释**（v1.x 批 ED-5）：它写着 crate「sits beside `ui/src-tauri`」；那个程序已在 v1.0 M8-4b 离开、去了 `riscdom-adminapp`。
 
 ## [1.0.1] - 2026-10-02
 

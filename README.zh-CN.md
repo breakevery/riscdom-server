@@ -48,7 +48,7 @@ riscdom-server --bind 127.0.0.1:7821 --workspace ./my-workspace
 
 | 端点 | 方法 | 应答 |
 |---|---|---|
-| `/v0/health` | GET | `{"status":"ok","version":"0.8.0","uptime_ms":N}` |
+| `/v0/health` | GET | `{"status":"ok","version":"1.0.0","uptime_ms":N}` |
 | `/v0/status` | GET | `{"status","version","uptime_ms","connections","sse_subscribers","agents","agent_id"}` |
 | `/v0/events` | GET | SSE 事件流（`text/event-stream`，可用 `Last-Event-ID` 补发）。 |
 | `/v0/runs`、`/v0/sessions`、`/v0/snapshots`、`/v0/llm/…`、`/v0/preflight`、`/v0/serial` | GET | 查询面其余部分：见 API 文档 §5.1。 |

@@ -112,8 +112,43 @@ jobs:
           printf '{\n  "version": 2\n}\n' > "dist/$name/settings.example.json"
           tar -czf "dist/$name.tar.gz" -C dist "$name"
 
+      # A Debian package for the Linux leg (v1.x batch ED-5). `dpkg-deb` ships with the
+      # ubuntu runner, so nothing is installed for it. It holds the same files the
+      # `.tar.gz` does, spread over the filesystem: the binary in `/usr/bin`, and the
+      # status page and the example settings under `/usr/share/riscdom-server`.
+      - name: pack the .deb
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(grep -m1 '^version = ' Cargo.toml | cut -d'"' -f2)
+          pkg="riscdom-server_${version}_amd64"
+          root="target/deb/${pkg}"
+          rm -rf "$root"
+          mkdir -p "$root/DEBIAN" "$root/usr/bin" "$root/usr/share/riscdom-server/web"
+          cp target/release/riscdom-server "$root/usr/bin/riscdom-server"
+          cp -r web/. "$root/usr/share/riscdom-server/web/"
+          printf '{\n  "version": 2\n}\n' > "$root/usr/share/riscdom-server/settings.example.json"
+          # The heredoc below is written at the block's own indent, so YAML strips it to
+          # column 0 -- a `control` file whose field lines are indented is not one dpkg reads.
+          cat > "$root/DEBIAN/control" <<EOF
+          Package: riscdom-server
+          Version: ${version}
+          Architecture: amd64
+          Section: net
+          Priority: optional
+          Depends: libc6
+          Maintainer: breakevery
+          Homepage: https://github.com/breakevery/riscdom-server
+          Description: RiscDom control plane (single node)
+          EOF
+          dpkg-deb --build --root-owner-group "$root" "dist/${pkg}.deb"
+          ls -l "dist/${pkg}.deb"
+
       - name: upload archive
         uses: actions/upload-artifact@v4
         with:
           name: riscdom-server-${{ runner.os }}
-          path: dist/*.tar.gz
+          path: |
+            dist/*.tar.gz
+            dist/*.deb

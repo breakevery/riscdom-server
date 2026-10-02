@@ -80,7 +80,7 @@ per request, so a rebuilt frontend needs no Rust rebuild, and traversal is refus
 
 | Endpoint | Method | Answers |
 |---|---|---|
-| `/v0/health` | GET | `{"status":"ok","version":"0.8.0","uptime_ms":N}` |
+| `/v0/health` | GET | `{"status":"ok","version":"1.0.0","uptime_ms":N}` |
 | `/v0/status` | GET | `{"status","version","uptime_ms","connections","sse_subscribers","agents","agent_id"}` |
 | `/v0/events` | GET | The SSE event stream (`text/event-stream`, replayable with `Last-Event-ID`). |
 | `/v0/runs`, `/v0/sessions`, `/v0/snapshots`, `/v0/llm/…`, `/v0/preflight`, `/v0/serial` | GET | The rest of the query surface: see the API document's §5.1. |

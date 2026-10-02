@@ -1,9 +1,11 @@
 //! The RiscDom control plane (v0.9): HTTP + SSE over the host's kernel facade.
 //!
-//! **Layer 3, the `server` host.** It sits beside `ui/src-tauri` and depends only
-//! on Layer 2's portable half (`host-core`), never on `agent` / `sandbox` / `audit`
-//! directly, and never on a Tauri type — since v0.9's A1 wave 3 it does not even link
-//! one (before that it depended on `host`, whose `tauri` edge was the known cost).
+//! **Layer 3, the control plane.** It depends only on Layer 2's portable half
+//! (`host-core`), never on `agent` / `sandbox` / `audit` directly, and never on a
+//! Tauri type — since v0.9's A1 wave 3 it does not even link one (before that it
+//! depended on `host`, whose `tauri` edge was the known cost). The desktop program
+//! that once sat beside it left for its own repository, `riscdom-adminapp`, in v1.0
+//! M8-4b; this repository serves the API and a minimal status page.
 //!
 //! The interface this implements is the one settled in
 //! `docs/control-plane-api.md` and `docs/control-plane-events.md`. What is here:

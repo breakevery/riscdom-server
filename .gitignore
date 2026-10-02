@@ -13,18 +13,11 @@
 /target
 **/target
 
-# Node / Vite
+# Node / Vite (the front end is `riscdom-adminapp`'s; this repository has no `ui/`)
 node_modules/
-# Build outputs: the *contents* are ignored, not the directory itself, so the one
-# file that has to be tracked below can be re-included (git cannot re-include a
-# file inside an excluded directory). See decisions §69.
+# Build outputs: the *contents* are ignored, not the directory itself — the packer and
+# the `.deb` tree stage under `dist/`.
 dist/*
-/ui/node_modules
-/ui/dist/*
-!/ui/dist/.gitkeep
-
-# Tauri generated
-/ui/src-tauri/gen/schemas
 
 # Python
 __pycache__/
